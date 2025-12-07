@@ -103,12 +103,32 @@ class MongoRetrieve(RetrieveABC):
             raise (UnknownURIError())
         return item["annotations"]
 
+    def set_annotations(self, uri, annotations):
+        """Set a dataset's annotations (replaces existing annotations)."""
+        result = self.collection.update_one(
+            {"uri": uri},
+            {"$set": {"annotations": annotations}}
+        )
+        if result.matched_count == 0:
+            raise (UnknownURIError())
+        return annotations
+
     def get_tags(self, uri):
         """Return a dataset's tags."""
         item = self.collection.find_one({"uri": uri})
         if item is None:
             raise (UnknownURIError())
         return item["tags"]
+
+    def set_tags(self, uri, tags):
+        """Set a dataset's tags (replaces existing tags)."""
+        result = self.collection.update_one(
+            {"uri": uri},
+            {"$set": {"tags": tags}}
+        )
+        if result.matched_count == 0:
+            raise (UnknownURIError())
+        return tags
 
     def get_config(self):
         """Return initial Config object, available app-instance independent."""
