@@ -11,6 +11,8 @@ from contextlib import contextmanager
 
 import pytest
 
+import os
+
 from pymongo import MongoClient
 
 from dtoolcore import DataSetCreator, DataSet
@@ -21,7 +23,7 @@ from dservercore.utils import generate_dataset_info
 from dserver_retrieve_plugin_mongo.utils_retrieve import MongoRetrieve
 
 
-MONGO_URI = "mongodb://localhost:27017"
+MONGO_URI = os.environ.get("TEST_MONGO_URI", "mongodb://localhost:27017")
 
 
 def random_string(
@@ -111,7 +113,12 @@ def test_functional(tmp_mongo_db):  # NOQA
     app.config = {
         "RETRIEVE_MONGO_URI": MONGO_URI,
         "RETRIEVE_MONGO_DB": tmp_mongo_db,
-        "RETRIEVE_MONGO_COLLECTION": "datasets"
+        "RETRIEVE_MONGO_COLLECTION": "datasets",
+        # Required by extensions that may be co-installed in the test
+        # environment (e.g. the dependency graph plugin).
+        "MONGO_URI": MONGO_URI,
+        "MONGO_DB": tmp_mongo_db,
+        "MONGO_COLLECTION": "datasets",
     }
     mongo_retreive.init_app(app)
 
@@ -165,7 +172,12 @@ def test_register_raises_when_metadata_too_large(tmp_mongo_db):  # NOQA
     app.config = {
         "RETRIEVE_MONGO_URI": MONGO_URI,
         "RETRIEVE_MONGO_DB": tmp_mongo_db,
-        "RETRIEVE_MONGO_COLLECTION": "datasets"
+        "RETRIEVE_MONGO_COLLECTION": "datasets",
+        # Required by extensions that may be co-installed in the test
+        # environment (e.g. the dependency graph plugin).
+        "MONGO_URI": MONGO_URI,
+        "MONGO_DB": tmp_mongo_db,
+        "MONGO_COLLECTION": "datasets",
     }
     mongo_retreive.init_app(app)
 
